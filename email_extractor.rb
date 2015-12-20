@@ -28,8 +28,9 @@ while(year < last_year)
 		io = open(link)
 	rescue OpenURI::HTTPError => error
 		response = error.io
-		puts response.status
-		puts response.string
+		#puts response.status
+		#puts response.string
+		puts "year: #{year}"
 		year = year + 1 
 		article_no = 0
 	end
@@ -39,33 +40,32 @@ while(year < last_year)
 	while page_index < num_pages
 		begin
 			page_text = reader.pages[page_index].text
-		rescue
+		rescue 
 			puts "I am trying to rescue"
 			page_index = page_index + 1
-			retry while (page_index < num_pages)
 		end
-		puts "Page text class: #{page_text.class}" 
-		puts "Page index: #{page_index}" 
-		emails = page_text.scan(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i)
+		emails = page_text.scan(/\b[a-zA-Z0-9.()_%+-]+@[a-zA-Z0-9().-]+\.[a-zA-Z]{2,4}\b/)
 		if emails.any? == true
+			puts "There are #{emails.size} emails in article #{article_no} from year #{year}"
 			all_emails = all_emails + emails;
 		end
 		page_index = page_index + 1
 	end
-	puts "year: #{year}" 
 	puts "Article number: #{article_no}" 
 	article_no = article_no + 1
 end
 
+puts "There are #{all_emails.size} emails"
+
 num_emails = all_emails.size
-email = 0
+email_num = 0
 while email_num < num_emails
 	email = all_emails[email_num]
 	email = email + "\n"
 	open('emails.txt', 'a') do |f|
 		f << email
 	end
-	email = email + 1
+	email_num = email_num + 1
 end
 
 
